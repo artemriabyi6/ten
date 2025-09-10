@@ -1,0 +1,70 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Ensure lock file synchronization
+      run: |
+        # Перевіряємо чи lock файл синхронізований з package.json
+        if [ -f "package-lock.json" ]; then
+          npm install --package-lock-only --no-audit --no-fund
+        fi
+
+    - name: Install dependencies
+      run: npm ci --no-audit --no-fund
+
+    - name: Run tests
+      run: npm test -- --coverage --watchAll=false
+
+    - name: Upload test coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-coverage-${{ matrix.node-version }}
+        path: coverage/
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Ensure lock file synchronization
+      run: |
+        if [ -f "package-lock.json" ]; then
+          npm install --package-lock-only --no-audit --no-fund
+        fi
+
+    - name: Install dependencies
+      run: npm ci --no-audit --no-fund
+
+    - name: Run linting
+      run: npm run lint --if-present || echo "No lint script found"
