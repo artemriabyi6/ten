@@ -24,8 +24,15 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    - name: Ensure lock file synchronization
+      run: |
+        # Перевіряємо чи lock файл синхронізований з package.json
+        if [ -f "package-lock.json" ]; then
+          npm install --package-lock-only --no-audit --no-fund
+        fi
+
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --no-audit --no-fund
 
     - name: Run tests
       run: npm test -- --coverage --watchAll=false
@@ -33,7 +40,7 @@ jobs:
     - name: Upload test coverage
       uses: actions/upload-artifact@v4
       with:
-        name: test-coverage
+        name: test-coverage-${{ matrix.node-version }}
         path: coverage/
 
   lint:
@@ -50,8 +57,14 @@ jobs:
         node-version: '20.x'
         cache: 'npm'
 
+    - name: Ensure lock file synchronization
+      run: |
+        if [ -f "package-lock.json" ]; then
+          npm install --package-lock-only --no-audit --no-fund
+        fi
+
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --no-audit --no-fund
 
     - name: Run linting
       run: npm run lint --if-present || echo "No lint script found"
