@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
-    "lint": "eslint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:ci": "jest --ci --coverage --watchAll=false --maxWorkers=2",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "build": "next build",
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "15.5.2",
