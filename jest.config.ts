@@ -9,7 +9,7 @@ const config: Config = {
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
-  moduleNameMapping: {
+  moduleNameMapper: {  // ЗМІНЕНО: moduleNameMapping -> moduleNameMapper
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   collectCoverage: true,
